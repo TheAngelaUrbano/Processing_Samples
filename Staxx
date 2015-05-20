@@ -1,0 +1,147 @@
+//Navigating the geometry
+import peasy.*;
+PeasyCam cam;
+
+//Saving functionality
+import processing.dxf.*;
+boolean record;
+
+//declare array 
+ArrayList<PVector> boxes = new ArrayList();
+
+//declare x,y,z positions of boxes 
+int x = 0;
+int y = 0;
+int z = 0;
+
+PFont f;
+
+String A = "Commands:";
+String B = "W = (+) Y-Axis";
+String C = "S = (-) Y-Axis";
+String D = "A = (-) X-Axis";
+String E = "D = (+) X-Axis";
+String F = "Z = (+) Z-Axis";
+String G = "X = (-) Z-Axis";
+String H = "Backspace = delete";
+String I = "P = Print .dxf file";
+String Title = "STAXX: An Experimental CAD Software";
+
+int lastBoxID = 0;
+
+
+void setup ()
+{
+  size (1024, 768, P3D);
+  smooth();
+  cam = new PeasyCam(this, 100);
+  boxes.add (new PVector(x, y, z)); //start with one box
+  
+  
+  f=createFont("Arial",16,true);
+}
+ 
+void draw ()
+{
+  background (140);
+  lights();
+  for (PVector box : boxes)
+    drawBox(box.x, box.y, box.z); //call drawBox function
+    
+  if (record) 
+  {
+    beginRaw(DXF, "output.dxf");
+  }
+  
+  if (record)
+  {
+    endRaw();
+    record = false;
+  }
+  
+  //Heads up display
+  cam.beginHUD();
+  noLights();
+  textFont(f,12);
+  text (Title,10,20);
+  text ("The Pennsylvania State University",10,35);
+  text ("ARCH 497: Algorithmic Tectonics", 10, 50);
+  text ("Angela Urbano",10, 65);
+  text (A,10,710);
+  text (B,10,725);
+  text (C,10,740);
+  text (E,100,725);
+  text (D,100,740);
+  text (F,190,725);
+  text (G,190,740);
+  text (H,280,725);
+  text (I,280,740);
+  cam.endHUD();
+  
+}
+
+// determine what direction the boxes are added to
+void keyPressed() 
+{
+  println(boxes.size());
+  println("Last Box ID: " + lastBoxID);
+    
+  if (key == 'd' || key == 'D')
+  {
+    x = x + 30;
+    boxes.add (new PVector(x, y, z));
+    lastBoxID ++;
+  } 
+  else if (key == 'w' || key == 'W')
+  {
+    y = y - 30;
+    boxes.add (new PVector(x, y, z));
+    lastBoxID ++;
+  } 
+  else if (key == 'a' || key == 'A')
+  {
+    x = x - 30;
+    boxes.add (new PVector(x, y, z));
+    lastBoxID ++;
+  }
+  else if (key == 's' || key == 'S')
+  {
+    y = y + 30;
+    boxes.add (new PVector(x, y, z));
+    lastBoxID ++;
+  }
+  else if (key == 'z' || key == 'Z')
+  {
+    z = z+30;
+    boxes.add (new PVector(x, y, z));
+    lastBoxID ++;
+  }
+  else if (key == 'x' || key == 'X')
+  {
+    z = z - 30;
+    boxes.add (new PVector(x, y, z));
+    lastBoxID ++;
+  }
+  else if (key == 'p' || key == 'P') // Saving functionality
+  {
+    record = true;
+    background(255); //Camera flash
+  }
+  else if (key == BACKSPACE)
+  {
+   println("   Removing box # " + lastBoxID);
+   boxes.remove(lastBoxID);   
+   lastBoxID = lastBoxID - 1;
+  }
+}
+
+//describe what is drawn in drawBox function 
+void drawBox (float  x, float  y, float  z)
+{
+  stroke (255,192);
+  fill (200,200,200);
+  pushMatrix();
+  translate (x, y, z);
+  box (30);
+  popMatrix();
+}
